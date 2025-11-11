@@ -69,7 +69,12 @@ authRoutes.post("/login", async (req, res) => {
 
 authRoutes.patch("/changePassword", async (req, res) => {
   try {
-    res.status(200).json({ Message: "User Changed Password Up Successfully!" });
+    const { oldPassword, newPassword } = req.body;
+
+    console.log(req.cookie);
+
+    const user = await UserModel.findById();
+    res.status(200).json({ Message: "Password Changed!" });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
