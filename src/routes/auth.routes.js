@@ -11,29 +11,33 @@ authRoutes.post("/signup", async (req, res) => {
 
     if (error) return res.status(400).json({ Message: error });
 
-    const { password } = req.body;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
     const newUser = await UserModel.create({
       ...req.body,
       password: hashedPassword,
     });
-    newUser.password = undefined;
 
-    res
-      .status(200)
-      .json({ Message: "User Signed Up Successfully!", data: newUser });
+    const userResponse = newUser.toObject();
+    delete userResponse.password;
+
+    res.status(201).json({
+      success: true,
+      Message: "User Signed Up Successfully!",
+      data: userResponse,
+    });
   } catch (err) {
-    res.status(500).json({ Error: err.message });
+    res.status(500).json({ success: false, Error: err.message });
   }
 });
 
 authRoutes.post("/login", async (req, res) => {
   try {
-    res.status(200).json({ Message: "User Logged Up Successfully!" });
+    res
+      .status(201)
+      .json({ success: true, Message: "User Logged Up Successfully!" });
   } catch (err) {
-    res.status(500).json({ Error: err.message });
+    res.status(500).json({ success: false, Error: err.message });
   }
 });
 

@@ -20,6 +20,7 @@ const validateSignupData = async (body) => {
   if (existingUser) return "User already registered";
 
   return null;
+  // Code will still work because JS returns undefined by default.
 };
 
 module.exports = validateSignupData;
