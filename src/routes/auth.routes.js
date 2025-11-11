@@ -1,5 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const validator = require("validator");
+const jwt = require("jsonwebtoken");
+
 const authRoutes = express.Router();
 const UserModel = require("../models/User.model");
 
@@ -8,7 +11,6 @@ const validateSignupData = require("../utils/validateSignupData");
 authRoutes.post("/signup", async (req, res) => {
   try {
     const error = await validateSignupData(req.body);
-
     if (error) return res.status(400).json({ Message: error });
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -23,7 +25,7 @@ authRoutes.post("/signup", async (req, res) => {
 
     res.status(201).json({
       success: true,
-      Message: "User Signed Up Successfully!",
+      Message: "Signup Successful!",
       data: userResponse,
     });
   } catch (err) {
@@ -33,9 +35,33 @@ authRoutes.post("/signup", async (req, res) => {
 
 authRoutes.post("/login", async (req, res) => {
   try {
-    res
-      .status(201)
-      .json({ success: true, Message: "User Logged Up Successfully!" });
+    const { email, password } = req.body;
+
+    if (!email || !password)
+      return res
+        .status(400)
+        .json({ Message: "Email and password are required" });
+
+    if (!validator.isEmail(email))
+      return res.status(400).json({ Message: "Enter a valid email" });
+
+    const user = await UserModel.findOne({ email });
+    if (!user)
+      return res.status(400).json({ Message: "Invalid email or password" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(400).json({ Message: "Invalid email or password" });
+
+    const token = jwt.sign({ _id: user._id }, "secret", { expiresIn: "7d" });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ success: true, Message: "Login Successful!" });
   } catch (err) {
     res.status(500).json({ success: false, Error: err.message });
   }
