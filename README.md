@@ -1,3 +1,3 @@
 git add .
-git commit -m "Update: Added Login Api"
+git commit -m "Update: ChangePassword Api added"
 git push -u origin main --force

@@ -1,12 +1,14 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
 const authRoutes = express.Router();
 const UserModel = require("../models/User.model");
+const userAuth = require("../middlewares/userAuth.middleware");
 
 const validateSignupData = require("../utils/validateSignupData");
+const validateLoginData = require("../utils/validateLoginData");
+const validateChangePassData = require("../utils/validateChangePassData");
 
 authRoutes.post("/signup", async (req, res) => {
   try {
@@ -35,15 +37,10 @@ authRoutes.post("/signup", async (req, res) => {
 
 authRoutes.post("/login", async (req, res) => {
   try {
+    const error = await validateLoginData(req.body);
+    if (error) return res.status(400).json({ Message: error });
+
     const { email, password } = req.body;
-
-    if (!email || !password)
-      return res
-        .status(400)
-        .json({ Message: "Email and password are required" });
-
-    if (!validator.isEmail(email))
-      return res.status(400).json({ Message: "Enter a valid email" });
 
     const user = await UserModel.findOne({ email });
     if (!user)
@@ -53,10 +50,13 @@ authRoutes.post("/login", async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ Message: "Invalid email or password" });
 
-    const token = jwt.sign({ _id: user._id }, "secret", { expiresIn: "7d" });
+    const token = jwt.sign({ _id: user._id }, "secret", {
+      expiresIn: "7d",
+    });
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
+      // secure: true, // wont store cookies in postman
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -67,13 +67,28 @@ authRoutes.post("/login", async (req, res) => {
   }
 });
 
-authRoutes.patch("/changePassword", async (req, res) => {
+authRoutes.patch("/changePassword", userAuth, async (req, res) => {
   try {
+    const error = await validateChangePassData(req.body);
+    if (error) return res.status(400).json({ Message: error });
+
     const { oldPassword, newPassword } = req.body;
 
-    console.log(req.cookie);
+    const checkPassword = await bcrypt.compare(oldPassword, req.user.password);
 
-    const user = await UserModel.findById();
+    if (!checkPassword)
+      return res.status(400).json({ Message: "Wrong Password" });
+
+    const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const updatePassword = await UserModel.findByIdAndUpdate(
+      req.user._id,
+      {
+        password: newHashedPassword,
+      },
+      { new: true }
+    );
+
     res.status(200).json({ Message: "Password Changed!" });
   } catch (err) {
     res.status(500).json({ Error: err.message });
