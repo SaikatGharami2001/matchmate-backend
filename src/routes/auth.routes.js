@@ -80,7 +80,6 @@ authRoutes.patch("/changePassword", userAuth, async (req, res) => {
       return res.status(400).json({ Message: "Wrong Password" });
 
     const newHashedPassword = await bcrypt.hash(newPassword, 10);
-
     const updatePassword = await UserModel.findByIdAndUpdate(
       req.user._id,
       {
@@ -103,11 +102,12 @@ authRoutes.post("/forgotPassword", async (req, res) => {
     if (!user) res.status(400).json({ Message: "Email not registered" });
 
     const token = await jwt.sign({ _id: user._id }, "secret", {
+      // maxAge: 10 * 60 * 60 * 1000,
       expiresIn: "15m",
     });
 
     user.resetToken = token;
-    user.resetTokenExpires = Date.now() + 15 * 60 * 1000;
+    user.resetTokenExpires = Date.now() + 1 * 1000;
     await user.save();
 
     res.status(200).json({ Message: user });
@@ -116,9 +116,20 @@ authRoutes.post("/forgotPassword", async (req, res) => {
   }
 });
 
-authRoutes.patch("/resetPassword", userAuth, async (req, res) => {
+authRoutes.post("/resetPassword", async (req, res) => {
   try {
-    res.status(200).json({ Message: "User Reset Password Successfully!" });
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.status(400).json({ Message: "Email not registered" });
+
+    const urlToken = req.query.token;
+
+    const realToken = user.resetToken;
+
+    const URL = `http://localhost:1234/resetPassword?token=${realToken}`;
+    res.send(URL);
+
+    res.status(200).json({ Message: "Password reset successful" });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }

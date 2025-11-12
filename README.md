@@ -1,3 +1,3 @@
 git add .
-git commit -m "Update: forgotPassword api added"
+git commit -m "Update: working on resetPassword api"
 git push -u origin main --force
