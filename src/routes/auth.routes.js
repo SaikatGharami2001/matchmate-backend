@@ -97,12 +97,26 @@ authRoutes.patch("/changePassword", userAuth, async (req, res) => {
 
 authRoutes.post("/forgotPassword", async (req, res) => {
   try {
+    const { email } = req.body;
+
+    const user = await UserModel.findOne({ email });
+    if (!user) res.status(400).json({ Message: "Email not registered" });
+
+    const token = await jwt.sign({ _id: user._id }, "secret", {
+      expiresIn: "15m",
+    });
+
+    user.resetToken = token;
+    user.resetTokenExpires = Date.now() + 15 * 60 * 1000;
+    await user.save();
+
+    res.status(200).json({ Message: user });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
 });
 
-authRoutes.post("/resetPassword", async (req, res) => {
+authRoutes.patch("/resetPassword", userAuth, async (req, res) => {
   try {
     res.status(200).json({ Message: "User Reset Password Successfully!" });
   } catch (err) {
