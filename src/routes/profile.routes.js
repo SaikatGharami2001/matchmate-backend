@@ -5,14 +5,20 @@ const userAuth = require("../middlewares/userAuth.middleware");
 
 const UserModel = require("../models/User.model");
 
-profileRoutes.get("/profile/viewProfile", userAuth, async (req, res) => {
+profileRoutes.get("/viewProfile", userAuth, async (req, res) => {
   try {
-    const loggedInUser = await UserModel.findById();
+    const user = req.user;
+
+    const loggedInUser = await UserModel.findById({ _id: user._id });
+
+    const userInfo = loggedInUser.toObject();
+    delete userInfo.password;
+
     res.status(200).json({
       Message: [
-        `Logged In User is : ${loggedInUser.firstName} + ${loggedInUser.lastName}`,
+        `Logged In User is : ${userInfo.firstName} ${userInfo.lastName}`,
       ],
-      data: loggedInUser,
+      data: userInfo,
     });
   } catch (err) {
     res.status(500).json({ Error: err.message });
