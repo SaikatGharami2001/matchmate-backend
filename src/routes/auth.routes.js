@@ -1,6 +1,5 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 const authRoutes = express.Router();
 const UserModel = require("../models/User.model");
@@ -15,11 +14,8 @@ authRoutes.post("/signup", async (req, res) => {
     const error = await validateSignupData(req.body);
     if (error) return res.status(400).json({ Message: error });
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
     const newUser = await UserModel.create({
       ...req.body,
-      password: hashedPassword,
     });
 
     const userResponse = newUser.toObject();
@@ -46,13 +42,11 @@ authRoutes.post("/login", async (req, res) => {
     if (!user)
       return res.status(400).json({ Message: "Invalid email or password" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.comparingPassword(password);
     if (!isMatch)
       return res.status(400).json({ Message: "Invalid email or password" });
 
-    const token = jwt.sign({ _id: user._id }, "secret", {
-      expiresIn: "7d",
-    });
+    const token = user.generateJWT();
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -101,10 +95,7 @@ authRoutes.post("/forgotPassword", async (req, res) => {
     const user = await UserModel.findOne({ email });
     if (!user) res.status(400).json({ Message: "Email not registered" });
 
-    const token = await jwt.sign({ _id: user._id }, "secret", {
-      // maxAge: 10 * 60 * 60 * 1000,
-      expiresIn: "15m",
-    });
+    const token = generateJWT();
 
     user.resetToken = token;
     user.resetTokenExpires = Date.now() + 1 * 1000;
