@@ -76,9 +76,7 @@ authRoutes.patch("/changePassword", userAuth, async (req, res) => {
     const newHashedPassword = await bcrypt.hash(newPassword, 10);
     const updatePassword = await UserModel.findByIdAndUpdate(
       req.user._id,
-      {
-        password: newHashedPassword,
-      },
+      { password: newHashedPassword },
       { new: true }
     );
 
