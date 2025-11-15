@@ -4,14 +4,14 @@ const UserModel = require("../models/User.model");
 const validateSignupData = async (body) => {
   const { firstName, lastName, email, password, age, gender } = body;
 
-  if (!firstName || !lastName) return "Enter your full name";
-  if (!email) return "Enter your email";
+  for (let key in body) {
+    if (!body[key]) return `Enter valid ${key}`;
+  }
+
   if (!validator.isEmail(email)) return "Enter a valid email";
-  if (!password) return "Enter your password";
-  if (password.length < 6) return "Password must be 6+ characters";
-  if (!age) return "Enter your age";
+
   if (age < 18) return "Only 18+ allowed";
-  if (!gender) return "Enter your gender";
+  if (password.length < 6) return "Password must be 6+ characters";
 
   const allowedGender = ["Male", "Female", "Others"];
   if (!allowedGender.includes(gender)) return "Enter valid gender";
