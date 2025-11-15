@@ -14,9 +14,7 @@ authRoutes.post("/signup", async (req, res) => {
     const error = await validateSignupData(req.body);
     if (error) return res.status(400).json({ Message: error });
 
-    const newUser = await UserModel.create({
-      ...req.body,
-    });
+    const newUser = await UserModel.create({ ...req.body });
 
     const userResponse = newUser.toObject();
     delete userResponse.password;

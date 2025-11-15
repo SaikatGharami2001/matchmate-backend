@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema({
   resetTokenExpires: { type: Date },
 });
 
+// Indexing for better performance
+
+userSchema.index({ firstName: 1, lastName: 1 });
+
 // Hashing Password
 
 userSchema.methods.hashingPassword = async function () {
