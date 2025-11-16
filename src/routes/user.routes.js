@@ -2,12 +2,21 @@ const express = require("express");
 const userRoutes = express.Router();
 
 const userAuth = require("../middlewares/userAuth.middleware");
+const ConnectionRequestModel = require("../models/ConnectionRequestModel");
 
-userRoutes.get("", userAuth, async (req, res) => {
+userRoutes.get("/user/requests/pending", userAuth, async (req, res) => {
   try {
-    const connections = 1;
-    res.status(200).json({ Message: "Connections", data: connections });
+    const requests = await ConnectionRequestModel.find({
+      toUserId: req.user._id,
+      status: "interested",
+    }).populate("fromUserId", "firstName lastName");
+
+    const pendingRequests = requests.map((field) => field.fromUserId);
+
+    res.status(200).json({ Message: "Connections", data: pendingRequests });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
 });
+
+module.exports = userRoutes;

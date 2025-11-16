@@ -1,3 +1,3 @@
 git add .
-git commit -m "Update: Accept/Reject api added"
+git commit -m "Update: Pending request api added"
 git push -u origin main --force
