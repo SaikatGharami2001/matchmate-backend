@@ -19,4 +19,23 @@ userRoutes.get("/user/requests/pending", userAuth, async (req, res) => {
   }
 });
 
+userRoutes.get("/user/connections", userAuth, async (req, res) => {
+  try {
+    const connectionRequests = await ConnectionRequestModel.find({
+      $or: [
+        { toUserId: req.user._id, status: "accepted" },
+        { fromUserId: req.user._id, status: "accepted" },
+      ],
+    })
+      .populate("fromUserId", "firstName lastName")
+      .populate("toUserId", "firstName lastName");
+
+    const allConnection = connectionRequests.map((field) => field.fromUserId);
+
+    res.status(200).json({ Message: "Connections", data: allConnection });
+  } catch (err) {
+    res.status(500).json({ Error: err.message });
+  }
+});
+
 module.exports = userRoutes;
