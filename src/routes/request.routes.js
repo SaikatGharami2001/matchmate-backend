@@ -44,7 +44,7 @@ requestRoutes.post(
       });
 
       if (duplicateRequest)
-        return res.status(400).json({ Message: "Connect already sent" });
+        return res.status(400).json({ Message: "Connect already exists" });
 
       const request = await ConnectionRequestModel.create({
         fromUserId,
@@ -64,7 +64,14 @@ requestRoutes.post(
 requestRoutes.patch(
   "/request/review/:status/:requestId",
   userAuth,
-  async (req, res) => {}
+  async (req, res) => {
+    try {
+      const connections = 1;
+      res.status(200).json({ Message: "Connections", data: connections });
+    } catch (err) {
+      res.status(500).json({ Error: err.message });
+    }
+  }
 );
 
 module.exports = requestRoutes;

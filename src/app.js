@@ -9,10 +9,12 @@ const db = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
 const profileRoutes = require("./routes/profile.routes");
 const requestRoutes = require("./routes/request.routes");
+const userRoutes = require("./routes/request.routes");
 
 app.use("/", authRoutes);
 app.use("/", profileRoutes);
 app.use("/", requestRoutes);
+app.use("/", userRoutes);
 
 db();
 

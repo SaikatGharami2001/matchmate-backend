@@ -1,5 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const authRoutes = express.Router();
 const UserModel = require("../models/User.model");
@@ -14,15 +16,21 @@ authRoutes.post("/signup", async (req, res) => {
     const error = await validateSignupData(req.body);
     if (error) return res.status(400).json({ Message: error });
 
-    const newUser = await UserModel.create({ ...req.body });
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    const userResponse = newUser.toObject();
-    delete userResponse.password;
+    const createdUser = await UserModel.create({
+      ...req.body,
+      password: hashedPassword,
+    });
+
+    const newUser = await UserModel.findById(createdUser._id).select(
+      "-password"
+    );
 
     res.status(201).json({
       success: true,
       Message: "Signup Successful!",
-      data: userResponse,
+      data: newUser,
     });
   } catch (err) {
     res.status(500).json({ success: false, Error: err.message });
@@ -40,11 +48,13 @@ authRoutes.post("/login", async (req, res) => {
     if (!user)
       return res.status(400).json({ Message: "Invalid email or password" });
 
-    const isMatch = await user.comparingPassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ Message: "Invalid email or password" });
 
-    const token = user.generateJWT();
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -66,7 +76,11 @@ authRoutes.patch("/changePassword", userAuth, async (req, res) => {
 
     const { oldPassword, newPassword } = req.body;
 
-    const checkPassword = await bcrypt.compare(oldPassword, req.user.password);
+    const currentUser = await UserModel.findById(req.user._id);
+    const checkPassword = await bcrypt.compare(
+      oldPassword,
+      currentUser.password
+    );
 
     if (!checkPassword)
       return res.status(400).json({ Message: "Wrong Password" });
@@ -89,36 +103,17 @@ authRoutes.post("/forgotPassword", async (req, res) => {
     const { email } = req.body;
 
     const user = await UserModel.findOne({ email });
-    if (!user) res.status(400).json({ Message: "Email not registered" });
-
-    const token = generateJWT();
-
-    user.resetToken = token;
-    user.resetTokenExpires = Date.now() + 1 * 1000;
-    await user.save();
-
-    res.status(200).json({ Message: user });
-  } catch (err) {
-    res.status(500).json({ Error: err.message });
-  }
-});
-
-authRoutes.post("/resetPassword", async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await UserModel.findOne({ email });
     if (!user) return res.status(400).json({ Message: "Email not registered" });
 
-    const urlToken = req.query.token;
+    const token = user.generateJWT();
 
-    const realToken = user.resetToken;
+    user.resetToken = token;
+    user.resetTokenExpires = Date.now() + 15 * 60 * 1000;
+    await user.save();
 
-    const URL = `http://localhost:1234/resetPassword?token=${realToken}`;
-    res.send(URL);
-
-    res.status(200).json({ Message: "Password reset successful" });
+    return res.status(200).json({ Message: "Reset link generated!" });
   } catch (err) {
-    res.status(500).json({ Error: err.message });
+    return res.status(500).json({ Error: err.message });
   }
 });
 
