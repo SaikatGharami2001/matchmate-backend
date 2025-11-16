@@ -61,13 +61,33 @@ requestRoutes.post(
   }
 );
 
-requestRoutes.patch(
+requestRoutes.post(
   "/request/review/:status/:requestId",
   userAuth,
   async (req, res) => {
     try {
-      const connections = 1;
-      res.status(200).json({ Message: "Connections", data: connections });
+      const { status, requestId } = req.params;
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status))
+        return res.status(400).json({ Message: "Wrong status" });
+
+      const connections = await ConnectionRequestModel.findOne({
+        _id: requestId,
+        toUserId: req.user._id,
+        status: "interested",
+      });
+
+      if (!connections)
+        return res
+          .status(400)
+          .json({ Message: "No such request or already handled" });
+
+      connections.status = status;
+      await connections.save();
+
+      res
+        .status(200)
+        .json({ Message: `Request ${status} successfully`, data: connections });
     } catch (err) {
       res.status(500).json({ Error: err.message });
     }
