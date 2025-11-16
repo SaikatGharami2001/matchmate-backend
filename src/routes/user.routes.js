@@ -30,7 +30,12 @@ userRoutes.get("/user/connections", userAuth, async (req, res) => {
       .populate("fromUserId", "firstName lastName")
       .populate("toUserId", "firstName lastName");
 
-    const allConnection = connectionRequests.map((field) => field.fromUserId);
+    const allConnection = connectionRequests.map((field) => {
+      if (field.fromUserId.toString() === req.user._id.toString()) {
+        return field.toUserId;
+      }
+      return field.fromUserId;
+    });
 
     res.status(200).json({ Message: "Connections", data: allConnection });
   } catch (err) {
