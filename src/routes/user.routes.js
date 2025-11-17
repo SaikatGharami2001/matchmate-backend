@@ -48,6 +48,10 @@ userRoutes.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const connections = await ConnectionRequestModel.find({
       $or: [{ toUserId: loggedInUser._id }, { fromUserId: loggedInUser._id }],
     }).select("toUserId fromUserId");
@@ -59,14 +63,26 @@ userRoutes.get("/feed", userAuth, async (req, res) => {
       hideUsersFromFeed.add(req.toUserId.toString());
     });
 
-    const users = await UserModel.find({
+    const feedUsers = {
       $and: [
         { _id: { $nin: Array.from(hideUsersFromFeed) } },
         { _id: { $ne: loggedInUser._id } },
       ],
-    }).select("firstName lastName");
+    };
 
-    res.status(200).json({ Message: "Connections : ", data: users });
+    const totalUsers = await UserModel.countDocuments(feedUsers);
+
+    const paginatedUsers = await UserModel.find(feedUsers)
+      .select("firstName lastName")
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      Message: "Suggested friends : ",
+      currentPage: page,
+      totalPages: Math.ceil(totalUsers / limit),
+      data: paginatedUsers,
+    });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
