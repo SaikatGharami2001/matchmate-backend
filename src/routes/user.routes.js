@@ -3,6 +3,7 @@ const userRoutes = express.Router();
 
 const userAuth = require("../middlewares/userAuth.middleware");
 const ConnectionRequestModel = require("../models/ConnectionRequestModel");
+const UserModel = require("../models/User.model");
 
 userRoutes.get("/user/requests/pending", userAuth, async (req, res) => {
   try {
@@ -45,7 +46,27 @@ userRoutes.get("/user/connections", userAuth, async (req, res) => {
 
 userRoutes.get("/feed", userAuth, async (req, res) => {
   try {
-    res.status(200).json({ Message: "Connections" });
+    const loggedInUser = req.user;
+
+    const connections = await ConnectionRequestModel.find({
+      $or: [{ toUserId: loggedInUser._id }, { fromUserId: loggedInUser._id }],
+    }).select("toUserId fromUserId");
+
+    const hideUsersFromFeed = new Set();
+
+    connections.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const users = await UserModel.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    }).select("firstName lastName");
+
+    res.status(200).json({ Message: "Connections : ", data: users });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
