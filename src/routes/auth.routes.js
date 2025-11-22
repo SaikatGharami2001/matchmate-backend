@@ -58,8 +58,8 @@ authRoutes.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      // secure: true, // wont store cookies in postman
-      // sameSite: "strict",
+      secure: true, // wont store cookies in postman
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
