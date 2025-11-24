@@ -58,12 +58,14 @@ authRoutes.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // wont store cookies in postman
-      sameSite: "strict",
+      secure: false, // wont store cookies in postman
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ success: true, Message: "Login Successful!" });
+    res
+      .status(200)
+      .json({ success: true, Message: "Login Successful!", data: user });
   } catch (err) {
     res.status(500).json({ success: false, Error: err.message });
   }
