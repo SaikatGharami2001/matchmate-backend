@@ -20,7 +20,7 @@ userRoutes.get("/user/requests/pending", userAuth, async (req, res) => {
   }
 });
 
-userRoutes.get("/user/connections", userAuth, async (req, res) => {
+userRoutes.get("/connections", userAuth, async (req, res) => {
   try {
     const connectionRequests = await ConnectionRequestModel.find({
       $or: [
@@ -28,17 +28,23 @@ userRoutes.get("/user/connections", userAuth, async (req, res) => {
         { fromUserId: req.user._id, status: "accepted" },
       ],
     })
-      .populate("fromUserId", "firstName lastName")
-      .populate("toUserId", "firstName lastName");
+      .populate("fromUserId", "firstName lastName age gender photoUrl")
+      .populate("toUserId", "firstName lastName age gender photoUrl");
 
-    const allConnection = connectionRequests.map((field) => {
-      if (field.fromUserId.toString() === req.user._id.toString()) {
-        return field.toUserId;
+    const myId = req.user._id.toString();
+
+    const allConnections = connectionRequests.map((item) => {
+      const fromUser = item.fromUserId;
+      const toUser = item.toUserId;
+
+      if (fromUser._id.toString() === myId) {
+        return toUser; // the OTHER person
       }
-      return field.fromUserId;
-    });
 
-    res.status(200).json(allConnection);
+      return fromUser; // the OTHER person
+    });
+    console.log("ALL CONNECTIONS:", allConnections);
+    res.status(200).json(allConnections);
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }

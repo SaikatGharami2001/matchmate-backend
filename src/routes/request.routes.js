@@ -52,9 +52,7 @@ requestRoutes.post(
         status,
       });
 
-      res
-        .status(201)
-        .json({ Message: "Connection request sent", data: request });
+      res.status(201).json(request);
     } catch (err) {
       res.status(500).json({ Error: err.message });
     }
@@ -85,9 +83,7 @@ requestRoutes.post(
       connections.status = status;
       await connections.save();
 
-      res
-        .status(200)
-        .json({ Message: `Request ${status} successfully`, data: connections });
+      res.status(200).json(connections);
     } catch (err) {
       res.status(500).json({ Error: err.message });
     }
