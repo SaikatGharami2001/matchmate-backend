@@ -27,11 +27,7 @@ authRoutes.post("/signup", async (req, res) => {
       "-password"
     );
 
-    res.status(201).json({
-      success: true,
-      Message: "Signup Successful!",
-      data: newUser,
-    });
+    res.status(201).json(newUser);
   } catch (err) {
     res.status(500).json({ success: false, Error: err.message });
   }
@@ -63,9 +59,7 @@ authRoutes.post("/login", async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res
-      .status(200)
-      .json({ success: true, Message: "Login Successful!", data: user });
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ success: false, Error: err.message });
   }

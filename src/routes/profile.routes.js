@@ -9,10 +9,7 @@ profileRoutes.get("/profile/view", userAuth, async (req, res) => {
   try {
     const user = req.user;
 
-    res.status(200).json({
-      Message: `Hello : ${user.firstName}`,
-      data: user,
-    });
+    res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
@@ -20,12 +17,14 @@ profileRoutes.get("/profile/view", userAuth, async (req, res) => {
 
 profileRoutes.patch("/profile/edit", userAuth, async (req, res) => {
   try {
+    if (!req.body.password || req.body.password.trim() === "")
+      delete req.body.password;
     const allowedEdits = ["firstName", "lastName", "password", "age", "gender"];
     const isValid = Object.keys(req.body).every((field) =>
       allowedEdits.includes(field)
     );
 
-    if (!isValid) return res.status(400).json({ Message: `Edit not allowed` });
+    if (!isValid) return res.status(400).json({ updatedUser });
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       req.user._id,
@@ -33,10 +32,7 @@ profileRoutes.patch("/profile/edit", userAuth, async (req, res) => {
       { new: true }
     ).select("-password");
 
-    res.status(200).json({
-      Message: [`Hello : ${updatedUser.firstName} `],
-      data: updatedUser,
-    });
+    res.status(200).json(updatedUser);
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }

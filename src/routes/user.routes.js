@@ -14,7 +14,7 @@ userRoutes.get("/user/requests/pending", userAuth, async (req, res) => {
 
     const pendingRequests = requests.map((field) => field.fromUserId);
 
-    res.status(200).json({ Message: "Connections", data: pendingRequests });
+    res.status(200).json({ pendingRequests });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
@@ -38,7 +38,7 @@ userRoutes.get("/user/connections", userAuth, async (req, res) => {
       return field.fromUserId;
     });
 
-    res.status(200).json({ Message: "Connections", data: allConnection });
+    res.status(200).json(allConnection);
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }
