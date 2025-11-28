@@ -14,7 +14,12 @@ const validateChangePassData = require("../utils/validateChangePassData");
 authRoutes.post("/signup", async (req, res) => {
   try {
     const error = await validateSignupData(req.body);
-    if (error) return res.status(400).json({ Message: error });
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        Message: error,
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -27,9 +32,17 @@ authRoutes.post("/signup", async (req, res) => {
       "-password"
     );
 
-    res.status(201).json(newUser);
+    return res.status(201).json({
+      success: true,
+      Message: "Account created successfully!",
+      user: newUser,
+    });
   } catch (err) {
-    res.status(500).json({ success: false, Error: err.message });
+    console.error("Signup Error:", err);
+    return res.status(500).json({
+      success: false,
+      Message: "Internal server error. Please try again later.",
+    });
   }
 });
 
