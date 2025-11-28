@@ -5,14 +5,17 @@ const userAuth = require("../middlewares/userAuth.middleware");
 const ConnectionRequestModel = require("../models/ConnectionRequestModel");
 const UserModel = require("../models/User.model");
 
-userRoutes.get("/user/requests/pending", userAuth, async (req, res) => {
+userRoutes.get("/requests/pending", userAuth, async (req, res) => {
   try {
     const requests = await ConnectionRequestModel.find({
       toUserId: req.user._id,
       status: "interested",
-    }).populate("fromUserId", "firstName lastName");
+    }).populate("fromUserId", "firstName lastName age");
 
-    const pendingRequests = requests.map((field) => field.fromUserId);
+    const pendingRequests = requests.map((field) => ({
+      requestId: field._id,
+      user: field.fromUserId,
+    }));
 
     res.status(200).json({ pendingRequests });
   } catch (err) {
@@ -28,8 +31,8 @@ userRoutes.get("/connections", userAuth, async (req, res) => {
         { fromUserId: req.user._id, status: "accepted" },
       ],
     })
-      .populate("fromUserId", "firstName lastName age gender photoUrl")
-      .populate("toUserId", "firstName lastName age gender photoUrl");
+      .populate("fromUserId", "firstName lastName age gender")
+      .populate("toUserId", "firstName lastName age gender");
 
     const myId = req.user._id.toString();
 
