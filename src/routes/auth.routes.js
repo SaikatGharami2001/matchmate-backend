@@ -54,8 +54,8 @@ authRoutes.post("/login", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // wont store cookies in postman
-      sameSite: "lax",
+      secure: true, // wont store cookies in postman
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -101,13 +101,15 @@ authRoutes.post("/forgotPassword", async (req, res) => {
     const user = await UserModel.findOne({ email });
     if (!user) return res.status(400).json({ Message: "Email not registered" });
 
-    const token = user.generateJWT();
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
     user.resetToken = token;
     user.resetTokenExpires = Date.now() + 15 * 60 * 1000;
     await user.save();
 
-    return res.status(200).json({ Message: "Reset link generated!" });
+    return res.status(200).json({ Message: "Reset link generated!", token });
   } catch (err) {
     return res.status(500).json({ Error: err.message });
   }

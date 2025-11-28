@@ -10,7 +10,7 @@ userRoutes.get("/requests/pending", userAuth, async (req, res) => {
     const requests = await ConnectionRequestModel.find({
       toUserId: req.user._id,
       status: "interested",
-    }).populate("fromUserId", "firstName lastName age");
+    }).populate("fromUserId", "firstName lastName age gender job");
 
     const pendingRequests = requests.map((field) => ({
       requestId: field._id,
@@ -31,8 +31,8 @@ userRoutes.get("/connections", userAuth, async (req, res) => {
         { fromUserId: req.user._id, status: "accepted" },
       ],
     })
-      .populate("fromUserId", "firstName lastName age gender")
-      .populate("toUserId", "firstName lastName age gender");
+      .populate("fromUserId", "firstName lastName age gender job")
+      .populate("toUserId", "firstName lastName age gender job");
 
     const myId = req.user._id.toString();
 
@@ -41,10 +41,10 @@ userRoutes.get("/connections", userAuth, async (req, res) => {
       const toUser = item.toUserId;
 
       if (fromUser._id.toString() === myId) {
-        return toUser; // the OTHER person
+        return toUser;
       }
 
-      return fromUser; // the OTHER person
+      return fromUser;
     });
     console.log("ALL CONNECTIONS:", allConnections);
     res.status(200).json(allConnections);
@@ -82,7 +82,7 @@ userRoutes.get("/feed", userAuth, async (req, res) => {
     const totalUsers = await UserModel.countDocuments(feedUsers);
 
     const paginatedUsers = await UserModel.find(feedUsers)
-      .select("firstName lastName")
+      .select("firstName lastName age gender job")
       .skip(skip)
       .limit(limit);
 

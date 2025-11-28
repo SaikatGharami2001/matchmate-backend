@@ -17,14 +17,30 @@ profileRoutes.get("/profile/view", userAuth, async (req, res) => {
 
 profileRoutes.patch("/profile/edit", userAuth, async (req, res) => {
   try {
-    if (!req.body.password || req.body.password.trim() === "")
+    if (req.body.password && req.body.password.trim() !== "") {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+    } else {
       delete req.body.password;
-    const allowedEdits = ["firstName", "lastName", "password", "age", "gender"];
-    const isValid = Object.keys(req.body).every((field) =>
+    }
+
+    const allowedEdits = [
+      "firstName",
+      "lastName",
+      "password",
+      "age",
+      "gender",
+      "job",
+    ];
+
+    const requestedFields = Object.keys(req.body);
+
+    const isValid = requestedFields.every((field) =>
       allowedEdits.includes(field)
     );
 
-    if (!isValid) return res.status(400).json({ updatedUser });
+    if (!isValid) {
+      return res.status(400).json({ Error: "Invalid fields in update" });
+    }
 
     const updatedUser = await UserModel.findByIdAndUpdate(
       req.user._id,

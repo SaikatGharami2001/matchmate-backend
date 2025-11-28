@@ -5,7 +5,7 @@ const UserModel = require("../models/User.model");
 const userAuth = async (req, res, next) => {
   try {
     const { token } = req.cookies;
-    if (!token) return res.status(401).json({ Error: "token not found" });
+    if (!token) return res.status(401).json({ Error: "Token missing" });
 
     const verifyToken = jwt.verify(token, process.env.JWT_SECRET);
     const { _id } = verifyToken;

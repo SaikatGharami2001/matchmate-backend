@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const requestRoutes = express.Router();
 const ConnectionRequestModel = require("../models/ConnectionRequestModel");
 const UserModel = require("../models/User.model");
-
 const userAuth = require("../middlewares/userAuth.middleware");
 
 requestRoutes.post(
@@ -11,40 +10,36 @@ requestRoutes.post(
   userAuth,
   async (req, res) => {
     try {
-      const loggedInUser = req.user;
-      const fromUserId = loggedInUser._id;
+      const fromUserId = req.user._id;
       const { status, toUserId } = req.params;
 
-      // Check if the toUserId is a valid mongoDb ID or not
       if (!mongoose.Types.ObjectId.isValid(toUserId))
         return res.status(400).json({ Message: "Invalid userId" });
 
-      // Checking the status is valid or not
       const allowedStatus = ["ignored", "interested"];
       if (!allowedStatus.includes(status))
-        return res.status(400).json({ Message: "Enter valid status" });
+        return res
+          .status(400)
+          .json({ Message: "Status must be 'ignored' or 'interested'" });
 
-      // Checking if the user exist on our DB or not
       const isUserExists = await UserModel.findById(toUserId);
       if (!isUserExists)
         return res.status(404).json({ Message: "User not exist" });
 
-      // Validating that user can't send connection to himself
       if (fromUserId.toString() === toUserId)
         return res
           .status(400)
           .json({ Message: "Can't send request to yourself" });
 
-      // Checking if the request already exists
       const duplicateRequest = await ConnectionRequestModel.findOne({
         $or: [
-          { toUserId: toUserId, fromUserId: fromUserId },
+          { toUserId, fromUserId },
           { toUserId: fromUserId, fromUserId: toUserId },
         ],
       });
 
       if (duplicateRequest)
-        return res.status(400).json({ Message: "Connect already exists" });
+        return res.status(400).json({ Message: "Connection already exists" });
 
       const request = await ConnectionRequestModel.create({
         fromUserId,
@@ -65,9 +60,15 @@ requestRoutes.post(
   async (req, res) => {
     try {
       const { status, requestId } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(requestId))
+        return res.status(400).json({ Message: "Invalid requestId" });
+
       const allowedStatus = ["accepted", "rejected"];
       if (!allowedStatus.includes(status))
-        return res.status(400).json({ Message: "Wrong status" });
+        return res
+          .status(400)
+          .json({ Message: "Status must be 'accepted' or 'rejected'" });
 
       const connections = await ConnectionRequestModel.findOne({
         _id: requestId,
@@ -76,9 +77,7 @@ requestRoutes.post(
       });
 
       if (!connections)
-        return res
-          .status(400)
-          .json({ Message: "No such request or already handled" });
+        return res.status(400).json({ Message: "No such pending request" });
 
       connections.status = status;
       await connections.save();

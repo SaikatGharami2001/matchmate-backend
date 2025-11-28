@@ -43,15 +43,21 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    age: { type: Number, min: 18, max: 40, required: true },
+    age: { type: Number, min: 18, max: 60, required: true },
 
     gender: {
       type: String,
       trim: true,
       enum: {
-        values: ["Male", "Female", "Others"],
-        message: "Gender must be Male, Female, or Others",
+        values: ["Male", "Female", "Other"],
+        message: "Gender must be Male, Female, or Other",
       },
+      required: true,
+    },
+
+    job: {
+      type: String,
+      trim: true,
       required: true,
     },
 
