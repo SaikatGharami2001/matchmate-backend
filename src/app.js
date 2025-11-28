@@ -6,8 +6,12 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5174", "https://matchmate-frontend.vercel.app"],
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+    origin: [
+      "http://localhost:5173",
+      "https://matchmate-frontend.vercel.app",
+      "https://matchmate-frontend-1nlxwqier-saikat-gharami.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
