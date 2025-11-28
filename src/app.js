@@ -9,7 +9,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://matchmate-frontend.vercel.app",
-      "https://matchmate-frontend-1nlxwqier-saikat-gharami.vercel.app",
+      "https://matchmate-frontend-1smpx3qpz-saikat-gharami.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
