@@ -78,32 +78,49 @@ authRoutes.post("/login", async (req, res) => {
   }
 });
 
-authRoutes.patch("/changePassword", userAuth, async (req, res) => {
+authRoutes.post("/change-password", async (req, res) => {
   try {
     const error = await validateChangePassData(req.body);
     if (error) return res.status(400).json({ Message: error });
 
-    const { oldPassword, newPassword } = req.body;
+    const { email, oldPassword, newPassword } = req.body;
 
-    const currentUser = await UserModel.findById(req.user._id);
-    const checkPassword = await bcrypt.compare(
-      oldPassword,
-      currentUser.password
-    );
+    const user = await UserModel.findOne({ email });
 
-    if (!checkPassword)
-      return res.status(400).json({ Message: "Wrong Password" });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        Message: "Email not registered. Please check again.",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        Message: "Incorrect old password.",
+      });
+    }
 
     const newHashedPassword = await bcrypt.hash(newPassword, 10);
-    const updatePassword = await UserModel.findByIdAndUpdate(
-      req.user._id,
+
+    await UserModel.findByIdAndUpdate(
+      user._id,
       { password: newHashedPassword },
       { new: true }
     );
 
-    res.status(200).json({ Message: "Password Changed!" });
+    return res.status(200).json({
+      success: true,
+      Message: "Password updated successfully!",
+    });
   } catch (err) {
-    res.status(500).json({ Error: err.message });
+    console.error("Change Password Error:", err);
+    return res.status(500).json({
+      success: false,
+      Message: "Internal server error. Please try again later.",
+    });
   }
 });
 
