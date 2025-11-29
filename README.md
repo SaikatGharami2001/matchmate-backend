@@ -225,7 +225,6 @@ GET /feed
   MONGODB_URI=mongodb+srv://saikatgharami2_db_user:Saikat%40123@cluster0.ibu5mor.mongodb.net/newUsers
   JWT_SECRET=secret
   PORT=5000
-  COOKIE_SECRET=
   ```
 
 # ⚙️ Environment Variables
