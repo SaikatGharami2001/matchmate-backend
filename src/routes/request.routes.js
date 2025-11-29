@@ -54,6 +54,19 @@ requestRoutes.post(
   }
 );
 
+requestRoutes.get("/requests/pending", userAuth, async (req, res) => {
+  try {
+    const pending = await ConnectionRequestModel.find({
+      toUserId: req.user._id,
+      status: "interested",
+    }).populate("fromUserId", "firstName lastName age");
+
+    res.status(200).json({ pendingRequests: pending });
+  } catch (err) {
+    res.status(500).json({ Error: err.message });
+  }
+});
+
 requestRoutes.post(
   "/request/review/:status/:requestId",
   userAuth,
