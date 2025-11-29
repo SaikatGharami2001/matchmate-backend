@@ -172,3 +172,29 @@ POST /request/review/accepted/67a1ffb9a0b29a48cc1c29a9
 GET /feed
 
 ```
+
+- Sample Response:
+
+```bash
+[
+  {
+    "_id": "67a1fe...",
+    "name": "Rohan",
+    "age": 23,
+    "about": "I love coding."
+  }
+]
+```
+
+# ⚠️ Error Handling & Edge Cases
+
+-Invalid login → 400 Bad Request
+-Missing token → 401 Unauthorized
+-Duplicate email → 409 Conflict
+-Sending request to yourself → 400
+-Already accepted/ignored request → safe-handled
+-Feed excludes:
+--yourself
+--accepted users
+--ignored users
+--pending users
