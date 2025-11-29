@@ -1,150 +1,219 @@
-# 🚀 MatchMate Backend
+# 🚀 MatchMate – Backend (Node.js + Express + MongoDB)
 
-MatchMate is a full-stack matchmaking platform designed to connect users through real-time interactions, profile management, and secure authentication.  
-This repository contains the **Node.js + Express** backend powered by **MongoDB**, **JWT authentication**, and **secure HTTP-only cookies**.
-
----
-
-## 🔗 Live API (Production)
-
-Base URL: https://matchmate-backend-nzyc.onrender.com
-
-Example endpoints:
-
-- **POST** `/signup`
-- **POST** `/login`
-- **GET** `/profile`
-- **POST** `/update-profile`  
-  _(More endpoints listed below)_
+Secure, scalable, and production-ready backend for the MatchMate platform.  
+Handles authentication, user profiles, connection requests, and feed data using a clean MVC architecture.
 
 ---
 
-## 🛠️ Tech Stack
+## 🏅 Tech Stack
 
 - **Node.js**
 - **Express.js**
-- **MongoDB (Mongoose)**
-- **Zustand (Frontend Store)**
+- **MongoDB (Atlas)**
+- **Mongoose**
 - **JWT Authentication**
-- **HTTP-Only Cookies**
-- **CORS Configured for Production**
-- **Render Deployment**
+- **bcrypt Password Hashing**
+- **Cookie-Parser (HTTP-only cookies)**
+- **CORS**
+- **Express Validator**
 
 ---
 
-## 📁 Project Structure
+## ✨ Features
 
+- 🔐 Secure JWT Authentication
+- 🍪 HTTP-only Cookie Sessions
+- 👤 User Profiles (edit, view)
+- 🤝 Connection Requests (send, accept, ignore)
+- 📨 Pending + Received requests
+- 🔎 Feed (all users except blocked, self, connected)
+- 🛡 Protected Routes with userAuth Middleware
+- 📁 Structured MVC Folder Architecture
+
+---
+
+## 📚 Table of Contents
+
+- [📦 Project Structure](#-project-structure)
+- [🧰 API Endpoints](#-api-endpoints)
+- [🔐 Authentication Flow](#-authentication-flow)
+- [🗄 Database Models](#-database-models)
+- [⚙️ Environment Variables](#-environment-variables)
+- [🚀 Running the Server](#-running-the-server)
+- [🏗 Architecture](#-architecture)
+- [🧑‍💻 Author](#-author)
+- [📄 License](#license)
+
+---
+
+# 📦 Project Structure
+
+```bash
 src/
 ├── config/
 │ └── db.js
+│
 ├── controllers/
-│ ├── auth.controller.js
-│ └── profile.controller.js
+│ └── (controller logic – neatly separated)
+│
 ├── middlewares/
-│ └── auth.middleware.js
+│ └── userAuth.middleware.js # JWT + Cookie auth
+│
 ├── models/
-│ └── User.model.js
+│ ├── User.model.js # Users schema
+│ └── ConnectionRequestModel.js # Requests schema
+│
 ├── routes/
 │ ├── auth.routes.js
-│ └── profile.routes.js
+│ ├── profile.routes.js
+│ ├── request.routes.js
+│ └── user.routes.js
+│
+├── utils/
+│ ├── validateLoginData.js
+│ ├── validateSignupData.js
+│ ├── validateChangePassData.js
+│
+├── app.js
 └── server.js
 
----
-
-## ⚙️ Environment Variables
-
-Create a `.env` file in the project root:
-
-MONGO_URL=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-PORT=5000
+```
 
 ---
 
-## 🚀 Getting Started (Local Development)
+# 🧰 API Endpoints
 
-### 1. Clone the repo
+## 🔐 **Authentication Routes**
 
-git clone https://github.com/YOUR_USERNAME/matchmate-backend.git
+**File:** `auth.routes.js`
 
-### 2. Install dependencies
+| Method | Endpoint           | Description                  |
+| ------ | ------------------ | ---------------------------- |
+| POST   | `/signup`          | Create new user              |
+| POST   | `/login`           | Login + set HTTP-only cookie |
+| POST   | `/logout`          | Logout user (clear cookie)   |
+| POST   | `/change-password` | Update password              |
 
+---
+
+## 👤 **Profile Routes**
+
+**File:** `profile.routes.js`
+
+| Method | Endpoint        | Description                 |
+| ------ | --------------- | --------------------------- |
+| GET    | `/profile/view` | View logged-in user profile |
+| PUT    | `/profile/edit` | Update profile details      |
+
+---
+
+## 🤝 **Connection Request Routes**
+
+**File:** `request.routes.js`
+
+| Method | Endpoint                             | Description                     |
+| ------ | ------------------------------------ | ------------------------------- |
+| POST   | `/request/send/:status/:toUserId`    | Send request (`like`, `ignore`) |
+| POST   | `/request/review/:status/:requestId` | Accept / Ignore request         |
+| GET    | `/requests/pending`                  | Get pending & received requests |
+
+---
+
+## 👥 **User + Feed Routes**
+
+**File:** `user.routes.js`
+
+| Method | Endpoint       | Description                                      |
+| ------ | -------------- | ------------------------------------------------ |
+| GET    | `/feed`        | Fetch all users except self, connected, rejected |
+| GET    | `/connections` | List all accepted connections                    |
+
+---
+
+# 🔐 Authentication Flow
+
+- Client → Login API
+  → Credentials verified
+  → Backend returns JWT inside HTTP-only cookie
+  → All protected APIs require cookie + userAuth middleware
+
+### Why HTTP-only cookies?
+
+- More secure than localStorage
+- Protected from JS access (XSS safe)
+- Auto-sent with every request
+
+---
+
+# 🗄 Database Models
+
+## 👤 **User Model**
+
+- Name, email, password
+- Age, gender, about
+- Location
+- Matches, pending, ignored, accepted arrays
+
+## 🔗 **ConnectionRequest Model**
+
+- fromUserId
+- toUserId
+- status (`pending`, `accepted`, `ignored`)
+- timestamps
+
+---
+
+# ⚙ Environment Variables
+
+Create a `.env` file:
+
+- MONGODB_URI=your_mongodb_connection_string
+- JWT_SECRET=your_jwt_secret
+- PORT=5000
+
+---
+
+## 1️⃣ Install dependencies
+
+```bash
 npm install
+```
 
-### 3. Start the backend
+## 2️⃣ Start dev server
 
+```bash
 npm run dev
+```
 
-Server runs at: http://localhost:5000
+## 3️⃣ Production build (Vercel / Render)
 
----
+```bash
+npm start
+```
 
-## 🔐 Authentication Flow
+# 🏗 Architecture
 
-### ✔ Login
+Frontend → Backend → Database
+React → Express → MongoDB Atlas
 
-- Validates email + password
-- Generates JWT
-- Sends token as **HTTP-only cookie**
-- Protects all authenticated routes
+Frontend:
 
-### ✔ Signup
+- UI rendering
+- Global state (Zustand)
 
-- Registers user
-- Hashes password using bcrypt
-- Stores user in MongoDB
+Backend:
 
----
+- Auth
+- JWT cookies
+- Request logic
+- Feed filtering
 
-## 🔥 API Routes
+Database:
 
-### **Auth Routes**
+- Users
+- Requests
 
-| Method | Endpoint  | Description              |
-| ------ | --------- | ------------------------ |
-| POST   | `/signup` | Register user            |
-| POST   | `/login`  | Login user & set cookies |
+## 👨‍💻 Author
 
-### **Profile Routes**
-
-| Method | Endpoint          | Description            |
-| ------ | ----------------- | ---------------------- |
-| GET    | `/profile`        | Get logged-in user     |
-| POST   | `/update-profile` | Update profile details |
-
----
-
-## 🧪 Postman / Thunder Client
-
-All routes use **Cookie-Based Authentication**.  
-Make sure to enable:
-
-Send Cookies -> YES
-Allow Redirects -> YES
-
----
-
-## 🌐 Deployment (Render)
-
-The project is deployed on **Render** and configured with:
-
-- Auto deploy on every push
-- Production CORS for Vercel frontend
-- Environment variables stored securely
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome.  
-For major changes, open an issue first to discuss improvements.
-
----
-
-## 📄 License
-
-MIT License.
-
----
-
-### ⭐ If you like this project, give the repo a star!
+- Saikat Gharami
+  GitHub: https://github.com/SaikatGharami2001

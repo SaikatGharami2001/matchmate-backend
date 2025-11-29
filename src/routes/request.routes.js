@@ -1,7 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const requestRoutes = express.Router();
+
 const ConnectionRequestModel = require("../models/ConnectionRequestModel");
+
 const UserModel = require("../models/User.model");
 const userAuth = require("../middlewares/userAuth.middleware");
 
@@ -56,12 +58,17 @@ requestRoutes.post(
 
 requestRoutes.get("/requests/pending", userAuth, async (req, res) => {
   try {
-    const pending = await ConnectionRequestModel.find({
+    const requests = await ConnectionRequestModel.find({
       toUserId: req.user._id,
       status: "interested",
-    }).populate("fromUserId", "firstName lastName age");
+    }).populate("fromUserId"); // populate entire user object
 
-    res.status(200).json({ pendingRequests: pending });
+    const pendingRequests = requests.map((field) => ({
+      requestId: field._id,
+      fromUserId: field.fromUserId, // FULL USER DATA
+    }));
+
+    res.status(200).json({ pendingRequests });
   } catch (err) {
     res.status(500).json({ Error: err.message });
   }

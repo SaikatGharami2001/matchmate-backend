@@ -5,24 +5,6 @@ const userAuth = require("../middlewares/userAuth.middleware");
 const ConnectionRequestModel = require("../models/ConnectionRequestModel");
 const UserModel = require("../models/User.model");
 
-userRoutes.get("/requests/pending", userAuth, async (req, res) => {
-  try {
-    const requests = await ConnectionRequestModel.find({
-      toUserId: req.user._id,
-      status: "interested",
-    }).populate("fromUserId", "firstName lastName age gender job");
-
-    const pendingRequests = requests.map((field) => ({
-      requestId: field._id,
-      user: field.fromUserId,
-    }));
-
-    res.status(200).json({ pendingRequests });
-  } catch (err) {
-    res.status(500).json({ Error: err.message });
-  }
-});
-
 userRoutes.get("/connections", userAuth, async (req, res) => {
   try {
     const connectionRequests = await ConnectionRequestModel.find({
@@ -46,7 +28,6 @@ userRoutes.get("/connections", userAuth, async (req, res) => {
 
       return fromUser;
     });
-    console.log("ALL CONNECTIONS:", allConnections);
     res.status(200).json(allConnections);
   } catch (err) {
     res.status(500).json({ Error: err.message });
