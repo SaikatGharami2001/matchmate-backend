@@ -132,23 +132,14 @@ src/
 
 # 🔐 Authentication Flow
 
-````bash
-
-Client
+- Client
   |
+  | HTTP (JWT, Cookies)
   v
-Login API
-  |
-  v
-Credentials verified
-  |
-  v
-Backend returns JWT inside HTTP-only cookie
-  |
-  v
-All protected APIs require cookie + userAuth middleware
-
-```
+  Login API
+  → Credentials verified
+  → Backend returns JWT inside HTTP-only cookie
+  → All protected APIs require cookie + userAuth middleware
 
 ### Why HTTP-only cookies?
 
@@ -190,7 +181,7 @@ Create a `.env` file:
 
 ```bash
 npm install
-````
+```
 
 ## 2️⃣ Start dev server
 
