@@ -132,10 +132,28 @@ src/
 
 # 🔐 Authentication Flow
 
-- Client → Login API
-  → Credentials verified
-  → Backend returns JWT inside HTTP-only cookie
-  → All protected APIs require cookie + userAuth middleware
+Client
+|
+|
+v
+Login API
+
+|
+|
+v
+
+Credentials verified
+
+|
+|
+v
+
+Backend returns JWT inside HTTP-only cookie
+|
+|
+v
+
+All protected APIs require cookie + userAuth middleware
 
 ### Why HTTP-only cookies?
 
