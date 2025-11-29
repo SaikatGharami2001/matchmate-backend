@@ -188,13 +188,13 @@ GET /feed
 
 # ⚠️ Error Handling & Edge Cases
 
--Invalid login → 400 Bad Request
--Missing token → 401 Unauthorized
--Duplicate email → 409 Conflict
--Sending request to yourself → 400
--Already accepted/ignored request → safe-handled
--Feed excludes:
---yourself
---accepted users
---ignored users
---pending users
+- Invalid login → 400 Bad Request
+- Missing token → 401 Unauthorized
+- Duplicate email → 409 Conflict
+- Sending request to yourself → 400
+- Already accepted/ignored request → safe-handled
+- Feed excludes:
+  -- yourself
+  -- accepted users
+  -- ignored users
+  -- pending users
