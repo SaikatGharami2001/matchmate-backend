@@ -135,26 +135,17 @@ src/
 ````bash
 
 Client
-|
-|
-v
+  |
+  v
 Login API
-
-|
-|
-v
-
+  |
+  v
 Credentials verified
-
-|
-|
-v
-
+  |
+  v
 Backend returns JWT inside HTTP-only cookie
-|
-|
-v
-
+  |
+  v
 All protected APIs require cookie + userAuth middleware
 
 ```
