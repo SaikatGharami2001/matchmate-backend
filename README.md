@@ -111,11 +111,11 @@ src/
 
 **File:** `request.routes.js`
 
-| Method | Endpoint                             | Description                     |
-| ------ | ------------------------------------ | ------------------------------- |
-| POST   | `/request/send/:status/:toUserId`    | Send request (`like`, `ignore`) |
-| POST   | `/request/review/:status/:requestId` | Accept / Ignore request         |
-| GET    | `/requests/pending`                  | Get pending & received requests |
+| Method | Endpoint                             | Description                           |
+| ------ | ------------------------------------ | ------------------------------------- |
+| POST   | `/request/send/:status/:toUserId`    | Send request (`interested`, `ignore`) |
+| POST   | `/request/review/:status/:requestId` | Accept / Ignore request               |
+| GET    | `/requests/pending`                  | Get pending & received requests       |
 
 ---
 
