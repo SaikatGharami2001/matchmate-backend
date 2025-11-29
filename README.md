@@ -132,6 +132,8 @@ src/
 
 # 🔐 Authentication Flow
 
+````bash
+
 Client
 |
 |
@@ -154,6 +156,8 @@ Backend returns JWT inside HTTP-only cookie
 v
 
 All protected APIs require cookie + userAuth middleware
+
+```
 
 ### Why HTTP-only cookies?
 
@@ -195,7 +199,7 @@ Create a `.env` file:
 
 ```bash
 npm install
-```
+````
 
 ## 2️⃣ Start dev server
 
