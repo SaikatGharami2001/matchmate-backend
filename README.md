@@ -198,3 +198,86 @@ GET /feed
   - accepted requests
   - ignored requests
   - pending requests
+
+# 🗄 Database Models
+
+👤 User Model
+
+- name
+- email
+- password
+- age, gender, about
+- connections, pending, ignored, requests
+
+# 🔗 ConnectionRequest Model
+
+- fromUser
+- toUser
+- status (pending, accepted, ignored)
+- timestamps
+
+# ⚙️ Environment Variables
+
+- Create:
+  .env
+
+  ```bash
+  MONGODB_URI=mongodb+srv://saikatgharami2_db_user:Saikat%40123@cluster0.ibu5mor.mongodb.net/newUsers
+  JWT_SECRET=secret
+  PORT=5000
+  COOKIE_SECRET=
+  ```
+
+# ⚙️ Environment Variables
+
+## 1️⃣ Install dependencies
+
+```bash
+npm install
+```
+
+## 2️⃣ Run dev server
+
+```bash
+npm run dev
+```
+
+## 3️⃣ Production
+
+```bash
+npm start
+```
+
+# 🧪 Tests (Example)
+
+- Create:
+  -- tests/auth.test.js
+
+# 🏗 Architecture
+
+```bash
+Frontend (React + Zustand + Axios)
+        |
+        |  HTTP (JWT Cookies)
+        v
+Backend (Node + Express + MongoDB)
+        |
+        |  Mongoose Models
+        v
+Database (MongoDB Atlas)
+
+```
+
+# 🛠 Roadmap
+
+- Rate limiting
+- Swagger API documentation
+- Block user feature
+- Cloudinary profile images
+- Pagination + infinite feed scroll
+- Delete account
+
+# **👨‍💻 Author**
+
+- Saikat Gharami
+  GitHub: https://github.com/SaikatGharami2001
