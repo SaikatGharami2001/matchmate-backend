@@ -194,7 +194,7 @@ GET /feed
 - Sending request to yourself → 400
 - Already accepted/ignored request → safe-handled
 - Feed excludes:
-  -- yourself
-  -- accepted users
-  -- ignored users
-  -- pending users
+  - yourself
+  - accepted requests
+  - ignored requests
+  - pending requests
