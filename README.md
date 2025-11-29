@@ -1,11 +1,34 @@
+<div align="center">
+
 # 🚀 MatchMate – Backend (Node.js + Express + MongoDB)
 
-Secure, scalable, and production-ready backend for the MatchMate platform.  
-Handles authentication, user profiles, connection requests, and feed data using a clean MVC architecture.
+A secure, production-ready backend powering the MatchMate social connection platform.  
+Handles authentication, profiles, connection requests, and feed logic using a clean MVC architecture.
+
+</div>
 
 ---
 
-## 🏅 Tech Stack
+# 📚 Table of Contents
+
+- [🏅 Tech Stack](#-tech-stack)
+- [✨ Features](#-features)
+- [📦 Project Structure](#-project-structure)
+- [🧰 API Endpoints](#-api-endpoints)
+- [📥 Sample API Requests](#-sample-api-requests)
+- [⚠️ Error Handling & Edge Cases](#️-error-handling--edge-cases)
+- [🗄 Database Models](#-database-models)
+- [⚙️ Environment Variables](#️-environment-variables)
+- [🚀 Running the Server](#-running-the-server)
+- [🧪 Tests (Example)](#-tests-example)
+- [🏗 Architecture](#-architecture)
+- [🛠 Roadmap](#-roadmap)
+- [🧑‍💻 Author](#-author)
+- [📄 License](#license)
+
+---
+
+# 🏅 Tech Stack
 
 - **Node.js**
 - **Express.js**
@@ -13,36 +36,22 @@ Handles authentication, user profiles, connection requests, and feed data using 
 - **Mongoose**
 - **JWT Authentication**
 - **bcrypt Password Hashing**
-- **Cookie-Parser (HTTP-only cookies)**
+- **Cookie-Parser** (HTTP-only cookies)
 - **CORS**
 - **Express Validator**
 
 ---
 
-## ✨ Features
+# ✨ Features
 
-- 🔐 Secure JWT Authentication
-- 🍪 HTTP-only Cookie Sessions
-- 👤 User Profiles (edit, view)
-- 🤝 Connection Requests (send, accept, ignore)
-- 📨 Pending + Received requests
-- 🔎 Feed (all users except blocked, self, connected)
-- 🛡 Protected Routes with userAuth Middleware
-- 📁 Structured MVC Folder Architecture
-
----
-
-## 📚 Table of Contents
-
-- [📦 Project Structure](#-project-structure)
-- [🧰 API Endpoints](#-api-endpoints)
-- [🔐 Authentication Flow](#-authentication-flow)
-- [🗄 Database Models](#-database-models)
-- [⚙️ Environment Variables](#-environment-variables)
-- [🚀 Running the Server](#-running-the-server)
-- [🏗 Architecture](#-architecture)
-- [🧑‍💻 Author](#-author)
-- [📄 License](#license)
+- 🔐 Secure JWT login system (HTTP-only cookies)
+- 👤 User registration, login, logout, password update
+- 📄 Profile view + edit
+- 🤝 Request system: send, accept, reject
+- 📥 Pending + Received requests
+- 🔎 Feed logic (smart filtering)
+- 🛡 Protected routes using middleware
+- 📁 Proper MVC structure
 
 ---
 
@@ -54,14 +63,14 @@ src/
 │ └── db.js
 │
 ├── controllers/
-│ └── (controller logic – neatly separated)
+│ └── (business logic)
 │
 ├── middlewares/
-│ └── userAuth.middleware.js # JWT + Cookie auth
+│ └── userAuth.middleware.js
 │
 ├── models/
-│ ├── User.model.js # Users schema
-│ └── ConnectionRequestModel.js # Requests schema
+│ ├── User.model.js
+│ └── ConnectionRequestModel.js
 │
 ├── routes/
 │ ├── auth.routes.js
@@ -72,159 +81,94 @@ src/
 ├── utils/
 │ ├── validateLoginData.js
 │ ├── validateSignupData.js
-│ ├── validateChangePassData.js
+│ └── validateChangePassData.js
 │
 ├── app.js
 └── server.js
-
 ```
 
 ---
 
 # 🧰 API Endpoints
 
-## 🔐 **Authentication Routes**
+## 🔐 Authentication (`auth.routes.js`)
 
-**File:** `auth.routes.js`
-
-| Method | Endpoint           | Description                  |
-| ------ | ------------------ | ---------------------------- |
-| POST   | `/signup`          | Create new user              |
-| POST   | `/login`           | Login + set HTTP-only cookie |
-| POST   | `/logout`          | Logout user (clear cookie)   |
-| POST   | `/change-password` | Update password              |
+| Method | Endpoint           | Description        |
+| ------ | ------------------ | ------------------ |
+| POST   | `/signup`          | Create user        |
+| POST   | `/login`           | Login + set cookie |
+| POST   | `/logout`          | Clear cookie       |
+| POST   | `/change-password` | Update password    |
 
 ---
 
-## 👤 **Profile Routes**
+## 👤 Profile (`profile.routes.js`)
 
-**File:** `profile.routes.js`
-
-| Method | Endpoint        | Description                 |
-| ------ | --------------- | --------------------------- |
-| GET    | `/profile/view` | View logged-in user profile |
-| PUT    | `/profile/edit` | Update profile details      |
+| Method | Endpoint        | Description        |
+| ------ | --------------- | ------------------ |
+| GET    | `/profile/view` | Get logged-in user |
+| PUT    | `/profile/edit` | Edit user profile  |
 
 ---
 
-## 🤝 **Connection Request Routes**
+## 🤝 Connection Requests (`request.routes.js`)
 
-**File:** `request.routes.js`
-
-| Method | Endpoint                             | Description                           |
-| ------ | ------------------------------------ | ------------------------------------- |
-| POST   | `/request/send/:status/:toUserId`    | Send request (`interested`, `ignore`) |
-| POST   | `/request/review/:status/:requestId` | Accept / Ignore request               |
-| GET    | `/requests/pending`                  | Get pending & received requests       |
+| Method | Endpoint                             | Description          |
+| ------ | ------------------------------------ | -------------------- |
+| POST   | `/request/send/:status/:toUserId`    | Send request         |
+| POST   | `/request/review/:status/:requestId` | Accept / Ignore      |
+| GET    | `/requests/pending`                  | Get pending requests |
 
 ---
 
-## 👥 **User + Feed Routes**
+## 👥 Users + Feed (`user.routes.js`)
 
-**File:** `user.routes.js`
-
-| Method | Endpoint       | Description                                      |
-| ------ | -------------- | ------------------------------------------------ |
-| GET    | `/feed`        | Fetch all users except self, connected, rejected |
-| GET    | `/connections` | List all accepted connections                    |
+| Method | Endpoint       | Description              |
+| ------ | -------------- | ------------------------ |
+| GET    | `/feed`        | Get user feed            |
+| GET    | `/connections` | Get accepted connections |
 
 ---
 
-# 🔐 Authentication Flow
+# 📥 Sample API Requests
+
+## 🔐 Login
 
 ```bash
-● Client
-    |
-    v
-● Login API
-    |
-    v
-● Credentials verified
-    |
-    v
-● Backend returns JWT inside HTTP-only cookie
-    |
-    v
-● All protected APIs require cookie + userAuth middleware
+curl -X POST http://localhost:5000/login \
+-H "Content-Type: application/json" \
+-d '{ "email": "test@example.com", "password": "123456" }'
 ```
 
-### Why HTTP-only cookies?
-
-- More secure than localStorage
-- Protected from JS access (XSS safe)
-- Auto-sent with every request
-
----
-
-# 🗄 Database Models
-
-## 👤 **User Model**
-
-- Name, email, password
-- Age, gender, about
-- Location
-- Matches, pending, ignored, accepted arrays
-
-## 🔗 **ConnectionRequest Model**
-
-- fromUserId
-- toUserId
-- status (`pending`, `accepted`, `ignored`)
-- timestamps
-
----
-
-# ⚙ Environment Variables
-
-Create a `.env` file:
-
-- MONGODB_URI=your_mongodb_connection_string
-- JWT_SECRET=your_jwt_secret
-- PORT=5000
-
----
-
-## 1️⃣ Install dependencies
+# 🤝 Send Connection Request
 
 ```bash
-npm install
+POST /request/send/like/67a1f9c9c1339b1824a275a1
 ```
 
-## 2️⃣ Start dev server
+- Response:
 
 ```bash
-npm run dev
+
+{
+  "message": "Request sent",
+  "status": "pending"
+}
+
 ```
 
-## 3️⃣ Production build (Vercel / Render)
+# 📥 Review Request
 
 ```bash
-npm start
+
+POST /request/review/accepted/67a1ffb9a0b29a48cc1c29a9
+
 ```
 
-# 🏗 Architecture
+# 🔎 Get Feed
 
-Frontend → Backend → Database
-React → Express → MongoDB Atlas
+```bash
 
-Frontend:
+GET /feed
 
-- UI rendering
-- Global state (Zustand)
-
-Backend:
-
-- Auth
-- JWT cookies
-- Request logic
-- Feed filtering
-
-Database:
-
-- Users
-- Requests
-
-## 👨‍💻 Author
-
-- Saikat Gharami
-  GitHub: https://github.com/SaikatGharami2001
+```
