@@ -130,7 +130,18 @@ src/
 
 ---
 
-# 📥 Sample API Requests
+## 📬 Postman Collection
+
+To test all MatchMate Backend APIs without running the frontend, you can use the ready-made Postman collection.
+
+👉 **[Download MatchMate API Collection](./MatchMate.postman_collection.json)**
+
+### How to Use
+
+1. Download the `.json` file
+2. Open Postman → click **Import**
+3. Select the file
+4. Set your environment variable:
 
 ## 🔐 Login
 
@@ -222,9 +233,9 @@ GET /feed
   .env
 
   ```bash
-  MONGODB_URI=mongodb+srv://saikatgharami2_db_user:Saikat%40123@cluster0.ibu5mor.mongodb.net/newUsers
-  JWT_SECRET=secret
-  PORT=5000
+  MONGODB_URI=<YOUR_MONGODB_URI>
+  JWT_SECRET=
+  PORT=
   ```
 
 # ⚙️ Environment Variables
