@@ -134,7 +134,7 @@ src/
 
 To test all MatchMate Backend APIs without running the frontend, you can use the ready-made Postman collection.
 
-👉 **[Download MatchMate API Collection](./MatchMate.postman_collection.json)**
+👉 **[Download MatchMate API Collection](./src/postman/matchmate-backend.postman_collection.json)**
 
 ### How to Use
 
