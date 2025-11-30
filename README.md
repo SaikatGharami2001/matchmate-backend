@@ -91,6 +91,8 @@ src/
 
 # 🧰 API Endpoints
 
+- Below are all backend REST API routes supported by MatchMate.
+
 ## 🔐 Authentication (`auth.routes.js`)
 
 | Method | Endpoint           | Description        |
@@ -133,6 +135,8 @@ src/
 ## 📬 Postman Collection
 
 To test all MatchMate Backend APIs without running the frontend, you can use the ready-made Postman collection.
+
+- You can test all MatchMate APIs using the Postman collection below.
 
 👉 **[Download MatchMate API Collection](./src/postman/matchmate-backend.postman_collection.json)**
 
